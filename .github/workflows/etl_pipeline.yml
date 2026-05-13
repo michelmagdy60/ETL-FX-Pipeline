@@ -1,1 +1,28 @@
+name: FX ETL Pipeline
 
+on:
+  schedule:
+    - cron: "0 8 * * *"   # Runs every day at 08:00 UTC
+  workflow_dispatch:        # Lets you trigger it manually from GitHub UI
+
+jobs:
+  run-etl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run ETL pipeline
+        env:
+          OER_API_KEY: ${{ secrets.OER_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python etl/pipeline.py
